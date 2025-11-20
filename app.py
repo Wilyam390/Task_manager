@@ -66,5 +66,33 @@ def health():
         'tasks_count': len(tasks)
     }, 200
 
+@app.route('/task/<int:task_id>/toggle', methods=['POST'])
+def toggle_task(task_id):
+    """Toggle task completion status"""
+    task = next((t for t in tasks if t['id'] == task_id), None)
+    
+    if task:
+        task['completed'] = not task['completed']
+        flash('Task status updated', 'success')
+    else:
+        flash('Task not found', 'error')
+    
+    return redirect(url_for('home'))
+
+@app.route('/task/<int:task_id>/delete', methods=['POST'])
+def delete_task(task_id):
+    """Delete a task"""
+    global tasks
+    
+    original_length = len(tasks)
+    tasks = [t for t in tasks if t['id'] != task_id]
+    
+    if len(tasks) < original_length:
+        flash('Task deleted successfully', 'success')
+    else:
+        flash('Task not found', 'error')
+    
+    return redirect(url_for('home'))
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)

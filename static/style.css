@@ -140,7 +140,6 @@ footer {
     border: 1px solid #f5c6cb;
 }
 
-/* Add Task Section */
 .add-task-section {
     background: #f8f9fa;
     padding: 30px;
@@ -197,4 +196,45 @@ footer {
     color: #999;
     padding: 60px 20px;
     font-size: 1.1em;
+}
+
+/* Task Actions */
+.task-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-toggle,
+.btn-delete {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-toggle {
+    background: #28a745;
+    color: white;
+}
+
+.btn-toggle:hover {
+    background: #218838;
+}
+
+.task-card.completed .btn-toggle {
+    background: #ffc107;
+    color: #333;
+}
+
+.btn-delete {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #c82333;
 }
