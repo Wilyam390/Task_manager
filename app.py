@@ -1,40 +1,31 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+import sqlite3
 from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'dev-secret-key-change-later'
 
-tasks = [
-    {
-        'id': 1,
-        'title': 'Sample Task',
-        'description': 'This is a sample task',
-        'completed': False,
-        'created_at': '2025-11-18 10:00'
-    },
-    {
-        'id': 2,
-        'title': 'Completed Task',
-        'description': 'This task is done',
-        'completed': True,
-        'created_at': '2025-11-17 15:30'
-    }
-]
-next_id = 3
+DATABASE = 'tasks.db'
+
+def get_db_connection():
+    """Create database connection"""
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 @app.route('/')
 def home():
     """Display all tasks"""
+    conn = get_db_connection()
+    tasks = conn.execute('SELECT * FROM tasks ORDER BY created_at DESC').fetchall()
+    conn.close()
     return render_template('index.html', tasks=tasks)
 
 @app.route('/task/add', methods=['POST'])
 def add_task():
     """Create a new task"""
-    global next_id
-    
     title = request.form.get('title', '').strip()
     description = request.form.get('description', '').strip()
-    
 
     if not title:
         flash('Task title is required', 'error')
@@ -44,55 +35,56 @@ def add_task():
         flash('Task title too long (max 255 characters)', 'error')
         return redirect(url_for('home'))
     
-    # new task
-    new_task = {
-        'id': next_id,
-        'title': title,
-        'description': description,
-        'completed': False,
-        'created_at': datetime.now().strftime('%Y-%m-%d %H:%M')
-    }
-    
-    tasks.append(new_task)
-    next_id += 1
+    conn = get_db_connection()
+    conn.execute(
+        'INSERT INTO tasks (title, description) VALUES (?, ?)',
+        (title, description)
+    )
+    conn.commit()
+    conn.close()
     
     flash('Task created successfully', 'success')
     return redirect(url_for('home'))
 
-@app.route('/health')
-def health():
-    return {
-        'status': 'healthy',
-        'tasks_count': len(tasks)
-    }, 200
-
 @app.route('/task/<int:task_id>/toggle', methods=['POST'])
 def toggle_task(task_id):
     """Toggle task completion status"""
-    task = next((t for t in tasks if t['id'] == task_id), None)
+    conn = get_db_connection()
+    task = conn.execute('SELECT * FROM tasks WHERE id = ?', (task_id,)).fetchone()
     
     if task:
-        task['completed'] = not task['completed']
+        new_status = 0 if task['completed'] else 1
+        conn.execute('UPDATE tasks SET completed = ? WHERE id = ?', (new_status, task_id))
+        conn.commit()
         flash('Task status updated', 'success')
     else:
         flash('Task not found', 'error')
     
+    conn.close()
     return redirect(url_for('home'))
 
 @app.route('/task/<int:task_id>/delete', methods=['POST'])
 def delete_task(task_id):
     """Delete a task"""
-    global tasks
+    conn = get_db_connection()
+    result = conn.execute('DELETE FROM tasks WHERE id = ?', (task_id,))
+    conn.commit()
     
-    original_length = len(tasks)
-    tasks = [t for t in tasks if t['id'] != task_id]
-    
-    if len(tasks) < original_length:
+    if result.rowcount > 0:
         flash('Task deleted successfully', 'success')
     else:
         flash('Task not found', 'error')
     
+    conn.close()
     return redirect(url_for('home'))
+
+@app.route('/health')
+def health():
+    """Health check endpoint"""
+    conn = get_db_connection()
+    count = conn.execute('SELECT COUNT(*) FROM tasks').fetchone()[0]
+    conn.close()
+    return {'status': 'healthy', 'tasks_count': count}, 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8000, debug=True)
