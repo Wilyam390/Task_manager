@@ -1,0 +1,127 @@
+name: Deploy to Azure Web App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🔄 Checkout code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 🧪 Run tests
+      run: |
+        pip install pytest
+        pytest tests/ -v
+
+    - name: 📦 Create deployment package
+      run: |
+        mkdir -p deployment
+        cp -r app.py config.py database.py requirements.txt gunicorn_config.py web.config deployment/
+        cp -r static templates deployment/
+        cd deployment
+        zip -r ../deploy.zip .
+
+    - name: 📤 Upload artifact for deployment
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-app
+        path: deploy.zip
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+    - name: 📥 Download artifact from build job
+      uses: actions/download-artifact@v3
+      with:
+        name: python-app
+
+    - name: 🚀 Deploy to Azure Web App
+      id: deploy-to-webapp
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: deploy.zip
+
+    - name: ⚙️ Configure App Settings
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    
+    - name: 🔧 Set environment variables
+      uses: azure/appservice-settings@v1
+      with:
+        app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+        app-settings-json: |
+          [
+            {
+              "name": "FLASK_ENV",
+              "value": "production",
+              "slotSetting": false
+            },
+            {
+              "name": "DB_TYPE",
+              "value": "azure_sql",
+              "slotSetting": false
+            },
+            {
+              "name": "AZURE_SQL_CONNECTION_STRING",
+              "value": "${{ secrets.AZURE_SQL_CONNECTION_STRING }}",
+              "slotSetting": false
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "${{ secrets.APPINSIGHTS_INSTRUMENTATIONKEY }}",
+              "slotSetting": false
+            },
+            {
+              "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+              "value": "true",
+              "slotSetting": false
+            }
+          ]
+
+    - name: 🏥 Health Check
+      run: |
+        echo "Waiting for app to start..."
+        sleep 30
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net/health || echo "000")
+        echo "Health check response: $response"
+        if [ "$response" = "200" ]; then
+          echo "✅ App is healthy!"
+        else
+          echo "⚠️ App returned status code: $response"
+          echo "App may need more time to start. Check logs in Azure Portal."
+        fi
+
+    - name: 🎉 Deployment Complete
+      run: |
+        echo "🚀 Deployment successful!"
+        echo "🌐 App URL: https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net"
