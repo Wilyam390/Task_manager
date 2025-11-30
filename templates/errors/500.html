@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - Internal Server Error</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .error-container {
+            text-align: center;
+            padding: 100px 20px;
+        }
+        .error-code {
+            font-size: 120px;
+            font-weight: bold;
+            color: #dc3545;
+            margin: 0;
+        }
+        .error-message {
+            font-size: 24px;
+            color: #333;
+            margin: 20px 0;
+        }
+        .error-description {
+            font-size: 16px;
+            color: #666;
+            margin: 20px 0;
+        }
+        .btn-home {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        .btn-home:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-container">
+            <h1 class="error-code">500</h1>
+            <p class="error-message">Internal Server Error</p>
+            <p class="error-description">
+                Something went wrong on our end. We're working to fix it!
+            </p>
+            <a href="{{ url_for('home') }}" class="btn-home">Go Home</a>
+        </div>
+    </div>
+</body>
+</html>

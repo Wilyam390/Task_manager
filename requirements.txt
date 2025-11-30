@@ -1,2 +1,17 @@
-Flask == 3.0.0
+Flask==2.3.0
+Werkzeug==2.3.0
 python-dotenv==1.0.0
+pytest==7.4.3
+gunicorn==21.2.0
+requests==2.31.0
+
+# Azure SQL Database support
+pyodbc==5.0.1
+
+# Azure Application Insights and monitoring
+opencensus-ext-azure==1.1.13
+opencensus-ext-flask==0.8.2
+opencensus-ext-logging==0.1.1
+
+# Logging
+colorlog==6.8.0
