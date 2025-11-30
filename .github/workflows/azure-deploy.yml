@@ -44,7 +44,7 @@ jobs:
         zip -r ../deploy.zip .
 
     - name: 📤 Upload artifact for deployment
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: python-app
         path: deploy.zip
@@ -58,60 +58,51 @@ jobs:
 
     steps:
     - name: 📥 Download artifact from build job
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: python-app
+
+    - name: � Azure Login
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: 🚀 Deploy to Azure Web App
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v2
       with:
         app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
         package: deploy.zip
-
-    - name: ⚙️ Configure App Settings
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
     
-    - name: 🔧 Set environment variables
-      uses: azure/appservice-settings@v1
-      with:
-        app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-        app-settings-json: |
-          [
-            {
-              "name": "FLASK_ENV",
-              "value": "production",
-              "slotSetting": false
-            },
-            {
-              "name": "DB_TYPE",
-              "value": "azure_sql",
-              "slotSetting": false
-            },
-            {
-              "name": "AZURE_SQL_CONNECTION_STRING",
-              "value": "${{ secrets.AZURE_SQL_CONNECTION_STRING }}",
-              "slotSetting": false
-            },
-            {
-              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-              "value": "${{ secrets.APPINSIGHTS_INSTRUMENTATIONKEY }}",
-              "slotSetting": false
-            },
-            {
-              "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
-              "value": "true",
-              "slotSetting": false
-            }
-          ]
+    - name: 🔧 Set environment variables with Azure CLI
+      run: |
+        az webapp config appsettings set \
+          --name ${{ secrets.AZURE_WEBAPP_NAME }} \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --settings \
+            FLASK_ENV="production" \
+            DB_TYPE="azure_sql" \
+            AZURE_SQL_CONNECTION_STRING="${{ secrets.AZURE_SQL_CONNECTION_STRING }}" \
+            APPINSIGHTS_INSTRUMENTATIONKEY="${{ secrets.APPINSIGHTS_INSTRUMENTATIONKEY }}" \
+            SCM_DO_BUILD_DURING_DEPLOYMENT="true"
+
+    - name: 🔧 Set startup command
+      run: |
+        az webapp config set \
+          --name ${{ secrets.AZURE_WEBAPP_NAME }} \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --startup-file "gunicorn --bind=0.0.0.0 --timeout 600 app:app"
+
+    - name: 🔄 Restart Web App
+      run: |
+        az webapp restart \
+          --name ${{ secrets.AZURE_WEBAPP_NAME }} \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }}
 
     - name: 🏥 Health Check
       run: |
         echo "Waiting for app to start..."
-        sleep 30
+        sleep 45
         response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net/health || echo "000")
         echo "Health check response: $response"
         if [ "$response" = "200" ]; then
