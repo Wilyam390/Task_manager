@@ -1,0 +1,49 @@
+2025-12-03 17:20:34,057 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-12-03 17:20:34,057 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-12-03 17:20:34,060 - werkzeug - INFO -  * Restarting with stat
+2025-12-03 17:20:34,147 - werkzeug - WARNING -  * Debugger is active!
+2025-12-03 17:20:34,157 - werkzeug - INFO -  * Debugger PIN: 301-595-085
+2025-12-03 17:20:57,468 - database - INFO - Connected to SQLite database
+2025-12-03 17:20:57,472 - database - INFO - Connected to SQLite database
+2025-12-03 17:20:57,475 - app - INFO - Rendering 1 tasks after filters
+2025-12-03 17:20:57,493 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:20:57] "GET / HTTP/1.1" 200 -
+2025-12-03 17:20:57,533 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:20:57] "GET /static/style.css HTTP/1.1" 200 -
+2025-12-03 17:20:57,667 - app - WARNING - 404 error: http://127.0.0.1:5000/favicon.ico
+2025-12-03 17:20:57,669 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:20:57] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-12-03 17:22:02,296 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:02,297 - app - INFO - Task created: assignment 1
+2025-12-03 17:22:02,298 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:02] "[32mPOST /task/add HTTP/1.1[0m" 302 -
+2025-12-03 17:22:02,301 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:02,301 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:02,302 - app - INFO - Rendering 2 tasks after filters
+2025-12-03 17:22:02,302 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:02] "GET / HTTP/1.1" 200 -
+2025-12-03 17:22:02,339 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:02] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-12-03 17:22:16,591 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:16,592 - app - INFO - Task 10 status toggled to 1
+2025-12-03 17:22:16,594 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:16] "[32mPOST /task/10/toggle HTTP/1.1[0m" 302 -
+2025-12-03 17:22:16,613 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:16,614 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:16,615 - app - INFO - Rendering 2 tasks after filters
+2025-12-03 17:22:16,616 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:16] "GET / HTTP/1.1" 200 -
+2025-12-03 17:22:16,658 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:16] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-12-03 17:22:34,559 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:34,560 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:34,560 - app - INFO - Rendering 1 tasks after filters
+2025-12-03 17:22:34,561 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:34] "GET /?q=assignment+1&status=all&sort=created_desc HTTP/1.1" 200 -
+2025-12-03 17:22:34,581 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:34] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-12-03 17:22:44,601 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:44,602 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:44,602 - app - INFO - Rendering 1 tasks after filters
+2025-12-03 17:22:44,604 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:44] "GET /?q=&status=completed&sort=created_desc HTTP/1.1" 200 -
+2025-12-03 17:22:44,628 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:44] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-12-03 17:22:46,672 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:46,672 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:46,673 - app - INFO - Rendering 2 tasks after filters
+2025-12-03 17:22:46,674 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:46] "GET / HTTP/1.1" 200 -
+2025-12-03 17:22:46,694 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:46] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+2025-12-03 17:22:50,544 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:50,545 - database - INFO - Connected to SQLite database
+2025-12-03 17:22:50,546 - app - INFO - Rendering 2 tasks after filters
+2025-12-03 17:22:50,546 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:50] "GET /?q=&status=all&sort=created_asc HTTP/1.1" 200 -
+2025-12-03 17:22:50,564 - werkzeug - INFO - 127.0.0.1 - - [03/Dec/2025 17:22:50] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
