@@ -1,9 +1,21 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, Response
 import logging
 import sys
 from datetime import datetime
 from config import config, Config
 from database import get_db_connection
+
+# Prometheus metrics
+try:
+    from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+    PROMETHEUS_AVAILABLE = True
+    
+    # Define metrics
+    REQUEST_COUNT = Counter('http_requests_total', 'Total HTTP requests', ['method', 'endpoint', 'status'])
+    REQUEST_LATENCY = Histogram('http_request_duration_seconds', 'HTTP request latency', ['method', 'endpoint'])
+    TASK_OPERATIONS = Counter('task_operations_total', 'Total task operations', ['operation'])
+except ImportError:
+    PROMETHEUS_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(
@@ -52,6 +64,20 @@ if app.config.get('APPINSIGHTS_INSTRUMENTATION_KEY'):
 
 logger.info(f"Application started in {env} mode")
 
+# Middleware to track metrics
+if PROMETHEUS_AVAILABLE:
+    @app.before_request
+    def before_request():
+        request.start_time = datetime.now()
+    
+    @app.after_request
+    def after_request(response):
+        if hasattr(request, 'start_time'):
+            latency = (datetime.now() - request.start_time).total_seconds()
+            REQUEST_LATENCY.labels(method=request.method, endpoint=request.endpoint or 'unknown').observe(latency)
+            REQUEST_COUNT.labels(method=request.method, endpoint=request.endpoint or 'unknown', status=response.status_code).inc()
+        return response
+
 @app.route('/')
 def home():
     """Display all tasks"""
@@ -72,7 +98,6 @@ def add_task():
     """Create a new task"""
     try:
         title = request.form.get('title', '').strip()
-        description = request.form.get('description', '').strip()
 
         if not title:
             logger.warning("Task creation attempted without title")
@@ -86,11 +111,14 @@ def add_task():
         
         conn = get_db_connection()
         conn.execute(
-            'INSERT INTO tasks (title, description) VALUES (?, ?)',
-            (title, description)
+            'INSERT INTO tasks (title) VALUES (?)',
+            (title,)
         )
         conn.commit()
         conn.close()
+        
+        if PROMETHEUS_AVAILABLE:
+            TASK_OPERATIONS.labels(operation='create').inc()
         
         logger.info(f"Task created: {title}")
         flash('Task created successfully', 'success')
@@ -111,6 +139,10 @@ def toggle_task(task_id):
             new_status = 0 if task['completed'] else 1
             conn.execute('UPDATE tasks SET completed = ? WHERE id = ?', (new_status, task_id))
             conn.commit()
+            
+            if PROMETHEUS_AVAILABLE:
+                TASK_OPERATIONS.labels(operation='toggle').inc()
+            
             logger.info(f"Task {task_id} status toggled to {new_status}")
             flash('Task status updated', 'success')
         else:
@@ -133,6 +165,9 @@ def delete_task(task_id):
         conn.commit()
         
         if result.rowcount > 0:
+            if PROMETHEUS_AVAILABLE:
+                TASK_OPERATIONS.labels(operation='delete').inc()
+            
             logger.info(f"Task {task_id} deleted")
             flash('Task deleted successfully', 'success')
         else:
@@ -168,6 +203,14 @@ def health():
             'status': 'unhealthy',
             'error': str(e)
         }), 500
+
+@app.route('/metrics')
+def metrics():
+    """Prometheus metrics endpoint"""
+    if PROMETHEUS_AVAILABLE:
+        return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
+    else:
+        return jsonify({'error': 'Prometheus client not installed'}), 503
 
 # Error handlers
 @app.errorhandler(404)
