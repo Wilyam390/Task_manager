@@ -1,4 +1,0 @@
-# Azure App Service Startup Command
-# Add this as the startup command in Azure App Service Configuration
-
-gunicorn --config gunicorn_config.py app:app

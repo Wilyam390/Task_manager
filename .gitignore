@@ -1,34 +1,31 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-venv/
-env/
-ENV/
-.venv
-
-# Flask
-instance/
-.env
+# Task Manager - Test Database
 *.db
-*.sqlite
+tasks.db
+
+# Coverage reports
+.coverage
+htmlcov/
+.pytest_cache/
+*.log
+
+# Environment
+.env
+.env.local
 
 # IDE
 .vscode/
 .idea/
 *.swp
-*.swo
 
 # OS
 .DS_Store
-Thumbs.db
-tasks.db
-<<<<<<< HEAD
-*.PublishSettings
-appsettings.json
-credentials.json
-=======
-.env
->>>>>>> 97c530a081e03c25087ee48c42c2b4acf2448e82
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+
+# Deployment artifacts
+*.zip
+deployment/
