@@ -47,7 +47,7 @@ docker-compose up -d
 - `ENVIRONMENT`: development/production
 - `SECRET_KEY`: Flask secret key
 - `AZURE_SQL_CONNECTION_STRING`: Database connection
-- `APPINSIGHTS_INSTRUMENTATION_KEY`: Azure monitoring
+- `APPINSIGHTS_INSTRUMENTATION_KEY`: Azure monitoring (keep the underscores; not `APPINSIGHTS_INSTRUMENTATIONKEY`)
 
 ### Production Deployment
 ```bash

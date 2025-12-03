@@ -7,10 +7,12 @@ tasks.db
 htmlcov/
 .pytest_cache/
 *.log
+app.log
 
 # Environment
 .env
 .env.local
+venv/
 
 # IDE
 .vscode/

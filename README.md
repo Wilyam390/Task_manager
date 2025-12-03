@@ -308,7 +308,7 @@ az webapp config appsettings set \
     AZURE_SQL_DATABASE=taskmanager-db \
     AZURE_SQL_USERNAME=sqladmin \
     AZURE_SQL_PASSWORD=<YourPassword> \
-    APPINSIGHTS_INSTRUMENTATION_KEY=<YourKey>
+    APPINSIGHTS_INSTRUMENTATION_KEY=<YourKey>  # Use this exact name (with underscores)
 ```
 
 ### Step 3: Set Startup Command
