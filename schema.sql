@@ -3,5 +3,6 @@ CREATE TABLE IF NOT EXISTS tasks (
     title VARCHAR(255) NOT NULL,
     description TEXT,
     completed BOOLEAN DEFAULT 0,
+    due_date DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

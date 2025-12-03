@@ -21,7 +21,9 @@ def client():
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
+            description TEXT,
             completed INTEGER DEFAULT 0,
+            due_date DATETIME,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')

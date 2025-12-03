@@ -25,6 +25,7 @@ CREATE TABLE tasks (
     id INT IDENTITY(1,1) PRIMARY KEY,
     title NVARCHAR(200) NOT NULL,
     completed BIT NOT NULL DEFAULT 0,
+    due_date DATETIME2 NULL,
     created_at DATETIME2 DEFAULT GETDATE()
 );
 

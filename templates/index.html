@@ -41,22 +41,51 @@
                                   placeholder="Task description (optional)" 
                                   rows="3"></textarea>
                     </div>
+                    <div class="form-group inline">
+                        <label for="due_date">Due date (optional)</label>
+                        <input type="datetime-local" 
+                               id="due_date" 
+                               name="due_date" 
+                               aria-label="Task due date">
+                    </div>
                     <button type="submit" class="btn-primary">Add Task</button>
                 </form>
             </section>
 
             <!-- Tasks List -->
             <section class="tasks-section">
-                <h2>Your Tasks ({{ tasks|length }})</h2>
+                <div class="tasks-header">
+                    <h2>Your Tasks ({{ tasks|length }})</h2>
+                    <form method="get" class="filters">
+                        <div class="filter-row">
+                            <input type="search" name="q" placeholder="Search by title" value="{{ filters.get('q','') if filters else '' }}" aria-label="Search tasks by title">
+                            <select name="status" aria-label="Filter by status">
+                                {% set status = filters.get('status','all') if filters else 'all' %}
+                                <option value="all" {% if status == 'all' %}selected{% endif %}>All</option>
+                                <option value="pending" {% if status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="completed" {% if status == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="overdue" {% if status == 'overdue' %}selected{% endif %}>Overdue</option>
+                                <option value="today" {% if status == 'today' %}selected{% endif %}>Today</option>
+                            </select>
+                            <select name="sort" aria-label="Sort by created date">
+                                {% set sort = filters.get('sort','created_desc') if filters else 'created_desc' %}
+                                <option value="created_desc" {% if sort == 'created_desc' %}selected{% endif %}>Newest first</option>
+                                <option value="created_asc" {% if sort == 'created_asc' %}selected{% endif %}>Oldest first</option>
+                            </select>
+                            <button type="submit" class="btn-secondary">Apply</button>
+                            <a class="btn-text" href="{{ url_for('home') }}">Reset</a>
+                        </div>
+                    </form>
+                </div>
                 
                 {% if tasks %}
                     <div class="tasks-list">
                         {% for task in tasks %}
-                        <div class="task-card {% if task.completed %}completed{% endif %}">
+                        <div class="task-card {% if task.completed %}completed{% endif %} {% if task.is_overdue %}overdue{% endif %}">
                             <div class="task-header">
                                 <h3>{{ task.title }}</h3>
                                 <span class="task-status">
-                                    {% if task.completed %}Completed{% else %}Pending{% endif %}
+                                    {% if task.is_overdue %}Overdue{% elif task.completed %}Completed{% else %}Pending{% endif %}
                                 </span>
                             </div>
                             
@@ -64,8 +93,16 @@
                             <p class="task-description">{{ task.description }}</p>
                             {% endif %}
                             
-                            <p class="task-date">Created: {{ task.created_at }}</p>
-                            <div>
+                            <p class="task-date">
+                                Created: 
+                                {% if task.created_at %}{{ task.created_at.strftime('%Y-%m-%d %H:%M') }}{% else %}N/A{% endif %}
+                            </p>
+                            {% if task.due_date %}
+                            <p class="task-due {% if task.is_overdue %}text-overdue{% elif task.is_due_today %}text-today{% endif %}">
+                                Due: {{ task.due_date.strftime('%Y-%m-%d %H:%M') }}
+                            </p>
+                            {% endif %}
+                            <div class="task-actions">
                                 <form action="{{ url_for('toggle_task', task_id=task.id) }}" method="POST" class="inline-form">
                                     <button type="submit" class="btn-toggle">
                                         {% if task.completed %}Mark as Pending{% else %}Mark as Completed{% endif %}

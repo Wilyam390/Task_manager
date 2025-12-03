@@ -92,6 +92,7 @@ def init_azure_sql_schema(conn):
             title NVARCHAR(255) NOT NULL,
             description NVARCHAR(MAX),
             completed BIT DEFAULT 0,
+            due_date DATETIME NULL,
             created_at DATETIME DEFAULT GETDATE()
         )
     """)

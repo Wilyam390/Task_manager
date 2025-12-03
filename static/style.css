@@ -61,6 +61,11 @@ main {
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
+.task-card.overdue {
+    border-left-color: #dc3545;
+    background: #fff5f5;
+}
+
 .task-card:hover {
     transform: translateX(5px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -106,6 +111,22 @@ main {
 .task-date {
     color: #999;
     font-size: 0.9em;
+}
+
+.task-due {
+    color: #555;
+    font-size: 0.95em;
+    margin-top: 6px;
+}
+
+.text-overdue {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.text-today {
+    color: #e39f00;
+    font-weight: 600;
 }
 
 footer {
@@ -175,6 +196,17 @@ footer {
     border-color: #667eea;
 }
 
+.form-group.inline {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group.inline label {
+    font-size: 0.95em;
+    color: #555;
+}
+
 .btn-primary {
     padding: 12px 30px;
     background: #667eea;
@@ -237,4 +269,70 @@ footer {
 
 .btn-delete:hover {
     background: #c82333;
+}
+
+.tasks-header {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+}
+
+.filters input[type="search"],
+.filters select {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 180px;
+}
+
+.btn-secondary {
+    padding: 10px 18px;
+    background: #f1f3ff;
+    border: 1px solid #667eea;
+    color: #4a4e69;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-secondary:hover {
+    background: #e2e6ff;
+}
+
+.btn-text {
+    align-self: center;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 10px;
+}
+
+.btn-text:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .filter-row {
+        flex-direction: column;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
 }
